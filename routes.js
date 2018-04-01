@@ -5,7 +5,8 @@ const router = express.Router();
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
 const saltRounds = 10;
-const db = mysql.createConnection({host: 'process.env.DB_HOST', user: process.env.DB_USER, password: process.env.DB_PASSWORD, database: process.env.DB_DATABASE});
+const { verifyToken } = require('./utils');
+const db = mysql.createConnection({host: process.env.DB_HOST, user: process.env.DB_USER, password: process.env.DB_PASSWORD, database: process.env.DB_DATABASE});
 
 //make connection with MYSQL database
 db.connect((err) => {
@@ -89,7 +90,7 @@ router.post('/api/signup', (req, res) => {
     }
 })
 
-function verifyToken(req, res, next) {
+/* function verifyToken(req, res, next) {
     //get auth header value
     const bearerHeader = req.headers['authorization'];
     //check if bearer is undefined
@@ -105,7 +106,6 @@ function verifyToken(req, res, next) {
         //forbidden
         res.sendStatus(403);
     }
-
-}
+} */
 
 module.exports = router;

@@ -1,16 +1,11 @@
 require('dotenv').config()
 const express = require('express');
-const bodyParser = require('body-parser')
+const mysql = require('mysql');
+const router = express.Router();
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
 const saltRounds = 10;
-const mysql = require('mysql');
-const app = express();
-
-const db = mysql.createConnection({host: process.env.DB_HOST, user: process.env.DB_USER, password: process.env.DB_PASSWORD, database: process.env.DB_DATABASE});
-
-// parse application/x-www-form-urlencoded
-app.use(bodyParser.urlencoded({extended: false}))
+const db = mysql.createConnection({host: 'process.env.DB_HOST', user: process.env.DB_USER, password: process.env.DB_PASSWORD, database: process.env.DB_DATABASE});
 
 //make connection with MYSQL database
 db.connect((err) => {
@@ -21,8 +16,14 @@ db.connect((err) => {
     console.log('connected as id ' + db.threadId);
 });
 
+//Middle ware that is specific to this router
+router.use(function timeLog(req, res, next) {
+    console.log('Time: ', Date.now());
+    next();
+  });
+
 //get all posts && checks if you are authorized with JWT
-app.get('/api/posts', verifyToken, (req, res) => {
+router.get('/api/posts', verifyToken, (req, res) => {
     console.log('test');
     jwt.verify(req.token, 'secretkey', (err, authData) => {
         if (err) res.json({ status:403,message:'JWT token is not valid' });
@@ -39,7 +40,7 @@ app.get('/api/posts', verifyToken, (req, res) => {
 })
 
 //Gives back a JWT token if login process was valid
-app.post('/api/login', (req, res) => {
+router.post('/api/login', (req, res) => {
     //check if email & password are set in the body
     if (typeof req.body.email !== 'undefined' && typeof req.body.password !== 'undefined') {
         //build up query
@@ -63,7 +64,7 @@ app.post('/api/login', (req, res) => {
 })
 
 //create new useraccount, store password as hash in DB
-app.post('/api/signup', (req, res) => {
+router.post('/api/signup', (req, res) => {
     //check if email & password are set in the body
     if (typeof req.body.email !== 'undefined' && typeof req.body.password !== 'undefined') {
         // Store hash in your password DB.
@@ -107,5 +108,4 @@ function verifyToken(req, res, next) {
 
 }
 
-//startup server on port 5000
-app.listen(process.env.API_PORT, () => console.log(`server listening on port ${process.env.API_PORT}`))
+module.exports = router;

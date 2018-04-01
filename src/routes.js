@@ -17,12 +17,6 @@ db.connect((err) => {
     console.log('connected as id ' + db.threadId);
 });
 
-//Middle ware that is specific to this router
-router.use(function timeLog(req, res, next) {
-    console.log('Time: ', Date.now());
-    next();
-  });
-
 //get all posts && checks if you are authorized with JWT
 router.get('/api/posts', verifyToken, (req, res) => {
     console.log('test');
@@ -89,23 +83,5 @@ router.post('/api/signup', (req, res) => {
         res.json({message: 'email & password need to be set in the body', status: 400})
     }
 })
-
-/* function verifyToken(req, res, next) {
-    //get auth header value
-    const bearerHeader = req.headers['authorization'];
-    //check if bearer is undefined
-    if (typeof bearerHeader !== 'undefined') {
-        //split at space
-        //FORMAT OF TOKEN authorization: Bearer <access_token>
-        const bearerToken = bearerHeader.split(' ')[1];
-        //set token
-        req.token = bearerToken;
-        //next middleware
-        next();
-    } else {
-        //forbidden
-        res.sendStatus(403);
-    }
-} */
 
 module.exports = router;

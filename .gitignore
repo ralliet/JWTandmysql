@@ -1,0 +1,8 @@
+# exclude environment variables for DB & API
+.env
+
+# exclude node_modules
+/node_modules
+
+# exclude log files
+npm-debug*
